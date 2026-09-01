@@ -11,7 +11,7 @@ def parse(argv: list[str]):
     return config_from_args(parser.parse_args(argv), parser)
 
 
-def test_positional_source_is_accepted(tmp_path: Path):
+def test_positional_source_is_accepted():
     """Regression: `people_counter.py pedestrian.mp4 --output annotated.mp4`."""
     config = parse(["pedestrian.mp4", "--output", "annotated.mp4"])
 
