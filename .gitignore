@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Model weights (auto-downloaded by ultralytics on first run)
+*.pt
+
+# Input footage and generated artifacts
+data/
+out/
+*.mp4
+!.gitkeep
+
+# OS / editor
+.DS_Store
