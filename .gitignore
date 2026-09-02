@@ -8,14 +8,14 @@ __pycache__/
 .coverage
 htmlcov/
 
-# Model weights (auto-downloaded by ultralytics on first run)
-*.pt
-
-# Input footage and generated artifacts
-data/
-out/
-*.mp4
-!.gitkeep
+# Input footage, generated artifacts, and model weights are kept out of git.
+# The directories themselves are tracked via .gitkeep so the layout is obvious.
+data/*
+!data/.gitkeep
+out/*
+!out/.gitkeep
+models/*
+!models/.gitkeep
 
 # OS / editor
 .DS_Store

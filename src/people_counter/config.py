@@ -7,8 +7,8 @@ from pathlib import Path
 
 from .counting import InDirection
 
-DEFAULT_MODEL = "yolov8n.pt"
-DEFAULT_OUTPUT = Path("annotated_output.mp4")
+DEFAULT_MODEL = "models/yolov8n.pt"
+DEFAULT_OUTPUT = Path("out/annotated.mp4")
 DEFAULT_CONFIDENCE = 0.35
 DEFAULT_FPS = 25.0
 DEFAULT_PROGRESS_INTERVAL = 30

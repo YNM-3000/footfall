@@ -8,7 +8,7 @@ station.
 ## How it works
 
 1. **Detection** — [YOLOv8](https://github.com/ultralytics/ultralytics)
-   (`yolov8n.pt`) finds every person in each video frame.
+   (`models/yolov8n.pt`) finds every person in each video frame.
 2. **Tracking** — ByteTrack (built into `ultralytics`) assigns a persistent
    ID to each detected person across frames.
 3. **Counting** — a virtual line is drawn across the frame (e.g. a gate or
@@ -33,36 +33,31 @@ creates the environment automatically on first run.
 
 ```bash
 # from a recorded video file
-uv run people_counter.py pedestrian.mp4 --output annotated.mp4
+uv run people-counter --source data/pedestrian.mp4 --output out/annotated.mp4
 
 # from a live camera stream (RTSP/HTTP URL) — same code, different source
-uv run people_counter.py rtsp://user:pass@camera-ip/stream --output annotated.mp4
+uv run people-counter --source rtsp://user:pass@camera-ip/stream --output out/annotated.mp4
 
 # from a webcam, for quick local testing
-uv run people_counter.py 0 --show
+uv run people-counter --source 0 --show
 
 # quick spot-check on the first 100 frames of a long clip
-uv run people_counter.py pedestrian.mp4 --output annotated.mp4 --max-frames 100
+uv run people-counter --source data/pedestrian.mp4 --max-frames 100
 ```
 
-Equivalent entry points, once the project is installed (`uv sync`):
-
-```bash
-uv run people-counter pedestrian.mp4 --output annotated.mp4
-uv run python -m people_counter pedestrian.mp4 --output annotated.mp4
-```
+`uv run python -m people_counter --source ...` is equivalent.
 
 ### Flags
 
 | Flag                 | Purpose                                                                                                                                                          |
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `SOURCE`             | Positional. Video file path, RTSP/HTTP URL, or webcam index. `--source` is still accepted as a deprecated alias.                                                 |
-| `--output`           | Annotated video path (default `annotated_output.mp4`). Parent directories are created automatically.                                                             |
+| `--source`           | Required. Video file path, RTSP/HTTP URL, or webcam index.                                                                                                       |
+| `--output`           | Annotated video path (default `out/annotated.mp4`). Parent directories are created automatically.                                                                |
 | `--line X1 Y1 X2 Y2` | Counting line in pixels. **Set this per camera** — perpendicular to the walking direction, across the actual gate. Defaults to a horizontal line across the middle. |
 | `--in-direction`     | `negative-to-positive` (default) or `positive-to-negative`. Flip if a test run shows IN/OUT swapped.                                                             |
 | `--conf`             | Detection confidence threshold (default `0.35`). Raise for fewer false positives, lower to catch more people.                                                    |
 | `--imgsz`            | Inference resolution (model default is 640). Raise to `1280`+ on high-resolution wide shots where people are small — costs speed.                                |
-| `--model`            | Ultralytics weights (default `yolov8n.pt`). `yolov8s/m/l/x.pt` trade speed for accuracy.                                                                         |
+| `--model`            | Ultralytics weights (default `models/yolov8n.pt`, auto-downloaded on first run). `yolov8s/m/l/x.pt` trade speed for accuracy.                                                                         |
 | `--max-frames N`     | Stop after N frames — fast accuracy spot-check on a long clip.                                                                                                   |
 | `--progress-interval`| Print running counts every N frames (default `30`).                                                                                                              |
 | `--show`             | Display the annotated video live while processing (press `q` to stop).                                                                                           |
@@ -78,7 +73,6 @@ uv run python -m people_counter pedestrian.mp4 --output annotated.mp4
 ## Project layout
 
 ```
-people_counter.py            # entrypoint shim: `uv run people_counter.py ...`
 src/people_counter/
 ├── cli.py                   # argument parsing, validation, reporting
 ├── config.py                # AppConfig + defaults (single source of truth)
@@ -88,8 +82,14 @@ src/people_counter/
 ├── geometry.py              # Line / BoundingBox value objects, side-of-line maths
 ├── rendering.py             # all OpenCV drawing
 └── video.py                 # VideoStream / AnnotatedVideoWriter context managers
-tests/                       # pytest suite (no model weights required)
+tests/                       # pytest suite (no model weights or footage required)
+data/                        # input footage (git-ignored)
+out/                         # annotated videos and other artifacts (git-ignored)
+models/                      # YOLO weights, auto-downloaded here (git-ignored)
 ```
+
+`data/`, `out/`, and `models/` are tracked as empty directories only; their
+contents stay out of git — clips and weights are large and reproducible.
 
 The layers are deliberately separable: `detection.PersonTracker` is a
 `Protocol`, so a different detector or tracker drops in without touching the
@@ -117,8 +117,8 @@ under a second and never downloads model weights.
 4. Adjust `--line`, `--conf`, `--imgsz`, and `--in-direction` until counts
    line up. Dense/rush-hour footage may need a larger model (`yolov8s.pt`+)
    and a higher `--imgsz` — expect accuracy to degrade under heavy occlusion.
-5. Once a file-based test is accurate, point `SOURCE` at the live camera URL
-   — no other code changes needed.
+5. Once a file-based test is accurate, point `--source` at the live camera
+   URL — no other code changes needed.
 
 ### Known accuracy limits
 

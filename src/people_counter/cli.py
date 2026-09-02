@@ -20,9 +20,9 @@ from .video import VideoSourceError
 
 DESCRIPTION = "Camera-based people in/out counter (YOLO + ByteTrack)."
 EPILOG = """examples:
-  people-counter pedestrian.mp4 --output annotated.mp4
-  people-counter rtsp://user:pass@camera-ip/stream --output annotated.mp4
-  people-counter 0 --show
+  people-counter --source data/pedestrian.mp4 --output out/annotated.mp4
+  people-counter --source rtsp://user:pass@camera-ip/stream --output out/annotated.mp4
+  people-counter --source 0 --show
 """
 STREAM_PREFIXES = ("rtsp://", "rtmp://", "http://", "https://", "udp://", "tcp://")
 
@@ -35,14 +35,9 @@ def build_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
-        "source",
-        nargs="?",
-        help="Video file path, RTSP/HTTP URL, or webcam index (e.g. 0).",
-    )
-    parser.add_argument(
         "--source",
-        dest="source_flag",
-        help="Deprecated alias for the positional SOURCE argument.",
+        required=True,
+        help="Video file path, RTSP/HTTP URL, or webcam index (e.g. 0).",
     )
     parser.add_argument(
         "--output",
@@ -107,11 +102,6 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def config_from_args(args: argparse.Namespace, parser: argparse.ArgumentParser) -> AppConfig:
-    source = args.source or args.source_flag
-    if not source:
-        parser.error("a video SOURCE is required (positional argument, e.g. pedestrian.mp4)")
-    if args.source and args.source_flag:
-        parser.error("pass SOURCE either positionally or via --source, not both")
     if args.max_frames is not None and args.max_frames < 1:
         parser.error("--max-frames must be at least 1")
     if args.imgsz is not None and args.imgsz < 32:
@@ -120,7 +110,7 @@ def config_from_args(args: argparse.Namespace, parser: argparse.ArgumentParser) 
         parser.error("--progress-interval must be at least 1")
 
     return AppConfig(
-        source=source,
+        source=args.source,
         output=args.output,
         model=args.model,
         confidence=args.conf,
