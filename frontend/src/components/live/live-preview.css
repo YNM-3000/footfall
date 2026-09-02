@@ -1,0 +1,31 @@
+.live-preview {
+  margin: 0;
+  display: grid;
+  gap: var(--space-tight);
+}
+
+.live-preview__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 60vh;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  background: var(--surface-inset);
+}
+
+.live-preview__caption {
+  color: var(--text-muted);
+  font-size: var(--text-micro);
+}
+
+.live-preview__pending {
+  margin: 0;
+  padding: var(--space-wide);
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-inset);
+  color: var(--text-muted);
+  font-size: var(--text-small);
+  text-align: center;
+}

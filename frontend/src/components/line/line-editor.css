@@ -1,0 +1,69 @@
+.line-editor {
+  display: grid;
+  gap: var(--space-tight);
+}
+
+/*
+ * Shrink-wraps the frame so the SVG overlay covers exactly the rendered
+ * image — any letterboxing would put the drawn line out of register with
+ * the pixel coordinates the backend counts against.
+ */
+.line-editor__stage {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+.line-editor__frame {
+  display: block;
+  /* Tall portrait footage would otherwise push the controls off-screen. */
+  max-height: 58vh;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  border-radius: var(--radius-md);
+  background: var(--surface-inset);
+}
+
+.line-editor__overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.line-editor__gate {
+  stroke: var(--accent-live);
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px oklch(60% 0.2 25 / 0.55));
+}
+
+.line-editor__arrow {
+  stroke: var(--accent-in);
+  stroke-linecap: round;
+}
+
+.line-editor__handle {
+  fill: var(--surface-base);
+  stroke: var(--accent-live);
+  stroke-width: 6;
+  cursor: grab;
+  transition: fill var(--duration-fast) var(--ease-out-expo);
+}
+
+.line-editor__handle:hover,
+.line-editor__handle:focus-visible {
+  fill: var(--accent-live);
+}
+
+.line-editor__handle:active {
+  cursor: grabbing;
+}
+
+.line-editor__hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-small);
+}

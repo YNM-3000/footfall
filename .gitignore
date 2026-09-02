@@ -19,3 +19,7 @@ models/*
 
 # OS / editor
 .DS_Store
+
+# Frontend
+node_modules/
+frontend/dist/

@@ -1,0 +1,46 @@
+/*
+ * Control-room palette: dark, low-chroma chrome so 4K video and the count
+ * readout carry all the visual weight. IN/OUT are semantic, never decorative.
+ */
+:root {
+  --surface-void: oklch(16% 0.012 250);
+  --surface-base: oklch(20% 0.014 250);
+  --surface-raised: oklch(25% 0.016 250);
+  --surface-inset: oklch(17% 0.014 250);
+
+  --border-subtle: oklch(32% 0.018 250);
+  --border-strong: oklch(45% 0.03 250);
+
+  --text-primary: oklch(96% 0.005 250);
+  --text-secondary: oklch(74% 0.012 250);
+  --text-muted: oklch(58% 0.014 250);
+
+  --accent-in: oklch(78% 0.17 165);
+  --accent-out: oklch(78% 0.16 65);
+  --accent-live: oklch(72% 0.19 25);
+  --accent-focus: oklch(72% 0.15 250);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+
+  --text-micro: 0.6875rem;
+  --text-small: 0.8125rem;
+  --text-body: 0.9375rem;
+  --text-title: clamp(1.1rem, 0.9rem + 0.6vw, 1.45rem);
+  --text-readout: clamp(2.75rem, 1.6rem + 4.2vw, 5.5rem);
+
+  --space-hair: 0.25rem;
+  --space-tight: 0.5rem;
+  --space-snug: 0.75rem;
+  --space-base: 1rem;
+  --space-wide: 1.5rem;
+  --space-section: 2.25rem;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --duration-fast: 120ms;
+  --duration-normal: 260ms;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}

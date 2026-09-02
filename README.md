@@ -1,9 +1,12 @@
 # People Counter
 
 Camera-based people counting: detect and track people via computer vision,
-count entries/exits across a virtual line, and (next phase) feed the
-resulting occupancy numbers into a real-time 3D visualization of the
-station.
+count entries and exits across a virtual line, and watch the numbers live in
+a browser.
+
+Today it counts uploaded recordings. It is built to grow into continuous
+monitoring of several live camera streams — see
+[Built for live streams](#built-for-live-streams).
 
 ## How it works
 
@@ -72,41 +75,129 @@ uv run people-counter --source data/pedestrian.mp4 --max-frames 100
 
 ## Project layout
 
+Three layers in a uv workspace. Each depends only on the one below it.
+
 ```
-src/people_counter/
-├── cli.py                   # argument parsing, validation, reporting
-├── config.py                # AppConfig + defaults (single source of truth)
-├── pipeline.py              # orchestration: frames -> tracking -> counting -> writing
-├── detection.py             # PersonTracker protocol + YOLO/ByteTrack implementation
-├── counting.py              # LineCrossingCounter, immutable Counts snapshots
-├── geometry.py              # Line / BoundingBox value objects, side-of-line maths
-├── rendering.py             # all OpenCV drawing
-└── video.py                 # VideoStream / AnnotatedVideoWriter context managers
-tests/                       # pytest suite (no model weights or footage required)
-data/                        # input footage (git-ignored)
-out/                         # annotated videos and other artifacts (git-ignored)
-models/                      # YOLO weights, auto-downloaded here (git-ignored)
+core/                        # the counting library — no web, no HTTP
+├── src/people_counter/
+│   ├── cli.py               # command line entry point
+│   ├── config.py            # AppConfig + defaults (single source of truth)
+│   ├── pipeline.py          # frames -> tracking -> counting -> events
+│   ├── detection.py         # PersonTracker protocol + YOLO/ByteTrack
+│   ├── counting.py          # LineCrossingCounter, Counts, CrossingEvent
+│   ├── geometry.py          # Line / BoundingBox, side-of-line maths
+│   ├── rendering.py         # all OpenCV drawing
+│   └── video.py             # VideoStream / writer / grab_frame
+└── tests/
+
+backend/                     # FastAPI service over the library
+├── src/people_counter_api/
+│   ├── app.py               # application factory
+│   ├── routes/              # videos, jobs, WebSocket stream
+│   ├── jobs.py              # JobRunner: pipeline execution off the event loop
+│   ├── storage.py           # SQLite: videos, jobs, crossing events
+│   ├── bus.py               # fan-out of live updates to dashboards
+│   └── preview.py           # JPEG encoding for browser previews
+└── tests/
+
+frontend/                    # React + Vite dashboard
+└── src/
+    ├── api/                 # typed client and wire types
+    ├── hooks/useJobStream   # WebSocket subscription with reconnect
+    └── components/          # line editor, counts readout, feed, history
+
+data/  out/  models/         # footage, artifacts, weights (git-ignored)
 ```
 
-`data/`, `out/`, and `models/` are tracked as empty directories only; their
-contents stay out of git — clips and weights are large and reproducible.
+The seams are deliberate. `detection.PersonTracker` is a `Protocol` and
+`pipeline.run()` takes an injected tracker, so a different detector drops in
+— and the whole test suite runs without model weights. The backend consumes
+the library the same way any other client would, so a publisher for another
+transport is a new module, not a rewrite.
 
-The layers are deliberately separable: `detection.PersonTracker` is a
-`Protocol`, so a different detector or tracker drops in without touching the
-counting, rendering, or CLI code, and `pipeline.run()` accepts an injected
-tracker. Publishing occupancy over WebSocket/MQTT is a new module plus a
-callback on `run()`, not a rewrite.
+## The dashboard
+
+Upload a recording, drag the counting line onto the frame where people
+actually walk, and watch counts arrive while it processes.
+
+```bash
+uv sync                              # installs core + backend
+uv run people-counter-api            # http://127.0.0.1:8000
+
+cd frontend && npm install
+npm run dev                          # http://localhost:5173, proxies /api
+```
+
+For a single-origin deployment, `npm run build` writes `frontend/dist`,
+which the API serves at `/` when present.
+
+### API
+
+| Endpoint | Purpose |
+| -------- | ------- |
+| `POST /api/videos` | Upload a recording; returns probed geometry |
+| `GET /api/videos/{id}/frame.jpg` | Still frame, for placing the counting line |
+| `POST /api/jobs` | Start counting with a line and settings |
+| `GET /api/jobs/{id}` | Status, progress, running totals |
+| `GET /api/jobs/{id}/crossings` | Every individual crossing event |
+| `GET /api/jobs/{id}/preview.jpg` | Latest annotated frame |
+| `POST /api/jobs/{id}/cancel` | Stop a running job |
+| `WS /api/jobs/{id}/stream` | Snapshot, then live progress and crossings |
+
+The socket sends a snapshot on connect, so a browser that joins late — or
+reconnects — starts from the truth rather than from whatever happens next.
+
+## Built for live streams
+
+Counting a file and monitoring a camera differ in ways that are painful to
+retrofit, so the core already accounts for them:
+
+- **Events, not totals, are the durable output.** Every crossing is stored
+  individually (`track_id`, direction, frame, timestamp). Totals are derived,
+  so they can be recomputed after a line or threshold changes.
+- **Video output is optional.** `output=None` skips writing entirely; a camera
+  that runs for days should not produce a forever-growing file.
+- **Frame sampling.** `frame_stride` keeps decoding real time while inference
+  runs slower, which is the lever that lets one host serve several cameras.
+- **Bounded state.** `LineCrossingCounter.forget()` prunes departed tracks, so
+  per-track memory does not grow without bound.
+- **Cancellable runs.** `should_stop` lets a supervisor shut a worker down
+  cleanly. A live camera is simply a job that never finishes.
+
+Still to build for live cameras: RTSP reconnect with latest-frame-wins
+(a live stream must *drop* backlog, never queue it, or each camera drifts
+further behind real time), and moving `JobRunner` from threads to processes
+or separate hosts.
+
+### Throughput
+
+Measured on this machine (CPU, `yolov8n`, per stream):
+
+| `imgsz` | Throughput | People detected per frame |
+| ------- | ---------- | ------------------------- |
+| 640 (model default) | 17.3 fps | 3.8 |
+| 1280 | 11.0 fps | 23.3 |
+
+On dense 4K footage the default resolution misses most of the crowd, so the
+dashboard defaults to 1280. At ~11 fps, one CPU host handles roughly two
+cameras at 5 fps each; more than that wants a GPU.
 
 ## Development
 
 ```bash
-uv sync --extra dev      # install runtime + test dependencies
-uv run pytest            # full suite, no weights or footage needed
-uv run pytest --cov=src  # with coverage
+uv sync --group dev              # runtime + test dependencies
+uv run pytest                    # core + backend, no weights or footage
+uv run pytest --cov=core/src --cov=backend/src
+uv run ruff check . && uv run ruff format --check .
+
+cd frontend
+npm run build                    # type-check and bundle
+npm run e2e                      # drives the real UI in Chromium
 ```
 
-Tests stub the tracker and generate a synthetic clip, so the suite runs in
-under a second and never downloads model weights.
+Tests stub the tracker and generate synthetic clips, so the suite runs in
+under a second and never downloads model weights. The e2e smoke test needs a
+running API and a real video (`VIDEO=../data/pedestrian.mp4`).
 
 ## Validating a new camera
 
@@ -130,8 +221,12 @@ raise `--imgsz` before trusting the totals.
 
 ## Roadmap
 
-- [x] Detection + tracking + line-crossing count on a video file or live camera
-- [ ] Publish per-camera/per-zone occupancy over WebSocket/MQTT
-- [ ] 3D station model (Godot) subscribing to live occupancy data
-- [ ] Per-zone density visualization / flow arrows in the 3D view
-- [ ] Multi-camera calibration and periodic occupancy true-up
+- [x] Detection + tracking + line-crossing counting (CLI)
+- [x] Counting API with crossing events, live updates, and persistence
+- [x] Dashboard: upload, place the line on the frame, watch counts live
+- [ ] Camera registry: RTSP sources with reconnect and health, replacing
+      upload-only input
+- [ ] Multi-camera tile grid with per-camera occupancy
+- [ ] Occupancy baseline and daily true-up (net drifts over long runs)
+- [ ] History charts from stored crossing events
+- [ ] Process- or host-level workers, and GPU inference
