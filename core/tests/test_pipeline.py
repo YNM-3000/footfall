@@ -11,6 +11,7 @@ import numpy as np
 import pytest
 
 from people_counter.config import AppConfig
+from people_counter.counting import Direction
 from people_counter.detection import TrackedPerson
 from people_counter.geometry import BoundingBox
 from people_counter.pipeline import run
@@ -74,3 +75,63 @@ def test_unopenable_source_raises_video_source_error(tmp_path: Path):
 
     with pytest.raises(VideoSourceError):
         run(config, tracker=WalkingPersonTracker())
+
+
+def test_run_emits_crossing_events_with_timestamps(clip: Path, tmp_path: Path):
+    events = []
+    config = AppConfig(source=str(clip), output=None)
+
+    run(config, tracker=WalkingPersonTracker(), on_event=events.append)
+
+    assert len(events) == 1
+    event = events[0]
+    assert event.direction is Direction.IN
+    assert event.track_id == 1
+    assert event.timestamp == pytest.approx(event.frame_index / 10.0)
+
+
+def test_output_none_writes_no_video(clip: Path, tmp_path: Path):
+    config = AppConfig(source=str(clip), output=None)
+
+    result = run(config, tracker=WalkingPersonTracker())
+
+    assert result.frames_processed == FRAME_COUNT
+    assert list(tmp_path.glob("*.mp4")) == [clip]
+
+
+def test_frame_stride_samples_frames(clip: Path, tmp_path: Path):
+    config = AppConfig(source=str(clip), output=None, frame_stride=2)
+
+    result = run(config, tracker=WalkingPersonTracker())
+
+    assert result.frames_processed == FRAME_COUNT // 2
+
+
+def test_should_stop_cancels_the_run(clip: Path, tmp_path: Path):
+    calls = {"n": 0}
+
+    def should_stop() -> bool:
+        calls["n"] += 1
+        return calls["n"] > 4
+
+    result = run(
+        AppConfig(source=str(clip), output=None),
+        tracker=WalkingPersonTracker(),
+        should_stop=should_stop,
+    )
+
+    assert result.frames_processed == 4
+
+
+def test_on_frame_receives_annotated_images(clip: Path, tmp_path: Path):
+    frames = []
+
+    run(
+        AppConfig(source=str(clip), output=None, max_frames=3),
+        tracker=WalkingPersonTracker(),
+        on_frame=frames.append,
+    )
+
+    assert len(frames) == 3
+    assert frames[0].image.shape == (FRAME_HEIGHT, FRAME_WIDTH, 3)
+    assert frames[0].people[0].track_id == 1

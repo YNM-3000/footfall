@@ -82,10 +82,25 @@ class VideoStream:
                 return
             yield frame
 
+    def frame_at(self, frame_index: int) -> np.ndarray:
+        capture = self._require_capture()
+        if frame_index > 0:
+            capture.set(cv2.CAP_PROP_POS_FRAMES, frame_index)
+        ok, frame = capture.read()
+        if not ok:
+            raise VideoSourceError(f"Could not read frame {frame_index} from {self._target}")
+        return frame
+
     def _require_capture(self) -> cv2.VideoCapture:
         if self._capture is None:
             raise VideoSourceError("VideoStream used outside of its context manager.")
         return self._capture
+
+
+def grab_frame(target: str | int, frame_index: int = 0) -> np.ndarray:
+    """Read a single frame — used to show an operator where to put the line."""
+    with VideoStream(target) as stream:
+        return stream.frame_at(frame_index)
 
 
 class AnnotatedVideoWriter:

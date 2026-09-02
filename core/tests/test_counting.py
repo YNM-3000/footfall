@@ -1,6 +1,6 @@
 import pytest
 
-from people_counter.counting import Counts, InDirection, LineCrossingCounter
+from people_counter.counting import Counts, Direction, InDirection, LineCrossingCounter
 from people_counter.geometry import Line
 
 ABOVE = (50.0, 10.0)  # negative side of the midline
@@ -86,3 +86,22 @@ def test_round_trip_nets_to_zero(line):
         counter.update(1, point)
 
     assert counter.counts.net == 0
+
+
+def test_update_returns_the_crossing_direction(line):
+    counter = LineCrossingCounter(line, InDirection.NEGATIVE_TO_POSITIVE)
+
+    assert counter.update(1, ABOVE) is None
+    assert counter.update(1, BELOW) is Direction.IN
+    assert counter.update(1, ABOVE) is Direction.OUT
+
+
+def test_forget_prunes_tracks_that_are_gone(line):
+    """A live camera runs for days; per-track state cannot grow forever."""
+    counter = LineCrossingCounter(line, InDirection.NEGATIVE_TO_POSITIVE)
+    counter.update(1, ABOVE)
+
+    counter.forget(active_track_ids={2})
+    counter.update(1, BELOW)
+
+    assert counter.counts == Counts(), "a forgotten track must be treated as newly seen"

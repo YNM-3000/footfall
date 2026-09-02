@@ -25,7 +25,9 @@ class AppConfig:
     """
 
     source: str
-    output: Path = DEFAULT_OUTPUT
+    output: Path | None = DEFAULT_OUTPUT
+    """Where to write the annotated video. None skips writing entirely —
+    monitoring a live camera wants events, not a forever-growing file."""
     model: str = DEFAULT_MODEL
     confidence: float = DEFAULT_CONFIDENCE
     imgsz: int | None = None
@@ -33,6 +35,9 @@ class AppConfig:
     in_direction: InDirection = InDirection.NEGATIVE_TO_POSITIVE
     show: bool = False
     max_frames: int | None = None
+    frame_stride: int = 1
+    """Process every Nth frame. Decoding stays real time while inference does
+    not have to: the lever that lets one host serve several cameras."""
     progress_interval: int = DEFAULT_PROGRESS_INTERVAL
 
     @property

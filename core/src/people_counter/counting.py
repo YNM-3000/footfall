@@ -8,6 +8,33 @@ from enum import Enum
 from .geometry import Line, Point
 
 
+class Direction(str, Enum):
+    """The direction of a single counted crossing."""
+
+    IN = "in"
+    OUT = "out"
+
+    def __str__(self) -> str:
+        return self.value
+
+
+@dataclass(frozen=True)
+class CrossingEvent:
+    """One person crossing the gate, at a point in time.
+
+    Events — not running totals — are the durable output of the pipeline:
+    totals can always be recomputed from events, but events cannot be
+    recovered from a total. Live dashboards, history charts, and occupancy
+    true-ups all read from this.
+    """
+
+    track_id: int
+    direction: Direction
+    frame_index: int
+    timestamp: float
+    """Seconds since the start of the stream or clip."""
+
+
 class InDirection(str, Enum):
     """Which side-of-line transition is treated as an entry."""
 
@@ -54,17 +81,28 @@ class LineCrossingCounter:
     def counts(self) -> Counts:
         return self._counts
 
-    def update(self, track_id: int, point: Point) -> None:
-        """Record a track's position for the current frame."""
+    def update(self, track_id: int, point: Point) -> Direction | None:
+        """Record a track's position; return the direction if it just crossed."""
         current_side = self._line.is_positive_side(point)
         previous_side = self._last_side.get(track_id)
         self._last_side[track_id] = current_side
 
         if previous_side is None or previous_side == current_side:
-            return
+            return None
 
         entered = self._is_entry(previous_side=previous_side, current_side=current_side)
         self._counts = self._counts.plus_entry() if entered else self._counts.plus_exit()
+        return Direction.IN if entered else Direction.OUT
+
+    def forget(self, active_track_ids: set[int]) -> None:
+        """Drop state for tracks that are gone.
+
+        On a live stream this runs for days; without pruning, the per-track
+        side map grows without bound.
+        """
+        self._last_side = {
+            track_id: side for track_id, side in self._last_side.items() if track_id in active_track_ids
+        }
 
     def _is_entry(self, *, previous_side: bool, current_side: bool) -> bool:
         crossed_negative_to_positive = not previous_side and current_side

@@ -80,6 +80,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="Which side-of-line transition counts as 'in'. Flip this if a test run shows IN/OUT swapped.",
     )
     parser.add_argument(
+        "--frame-stride",
+        type=int,
+        default=1,
+        metavar="N",
+        help="Run detection on every Nth frame (default: 1). Trades count fidelity for speed.",
+    )
+    parser.add_argument(
+        "--no-video",
+        action="store_true",
+        help="Skip writing the annotated video; report counts only.",
+    )
+    parser.add_argument(
         "--max-frames",
         type=int,
         default=None,
@@ -106,12 +118,14 @@ def config_from_args(args: argparse.Namespace, parser: argparse.ArgumentParser) 
         parser.error("--max-frames must be at least 1")
     if args.imgsz is not None and args.imgsz < 32:
         parser.error("--imgsz must be at least 32")
+    if args.frame_stride < 1:
+        parser.error("--frame-stride must be at least 1")
     if args.progress_interval < 1:
         parser.error("--progress-interval must be at least 1")
 
     return AppConfig(
         source=args.source,
-        output=args.output,
+        output=None if args.no_video else args.output,
         model=args.model,
         confidence=args.conf,
         imgsz=args.imgsz,
@@ -119,6 +133,7 @@ def config_from_args(args: argparse.Namespace, parser: argparse.ArgumentParser) 
         in_direction=args.in_direction,
         show=args.show,
         max_frames=args.max_frames,
+        frame_stride=args.frame_stride,
         progress_interval=args.progress_interval,
     )
 
@@ -168,4 +183,5 @@ def _print_summary(result: RunResult, config: AppConfig) -> None:
     print(f"IN:  {counts.entries}")
     print(f"OUT: {counts.exits}")
     print(f"NET (people currently inside, relative to start of clip): {counts.net}")
-    print(f"Annotated video written to: {config.output}")
+    if config.output is not None:
+        print(f"Annotated video written to: {config.output}")
