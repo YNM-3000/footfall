@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 
 import type { Line } from "../../api/types";
 import { useElementSize } from "../../hooks/useElementSize";
@@ -34,6 +35,7 @@ export function LineEditor({
   invertDirection,
   onChange,
 }: LineEditorProps) {
+  const { t } = useTranslation();
   const [wrapperRef, size] = useElementSize<HTMLDivElement>();
   const [dragging, setDragging] = useState<Handle>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -77,7 +79,7 @@ export function LineEditor({
   return (
     <div className="line-editor" ref={wrapperRef}>
       <div className="line-editor__stage">
-        <img className="line-editor__frame" src={imageUrl} alt="First frame of the uploaded video" />
+        <img className="line-editor__frame" src={imageUrl} alt={t("line.frameAlt")} />
         <svg
           ref={svgRef}
           className="line-editor__overlay"
@@ -87,7 +89,7 @@ export function LineEditor({
           onPointerUp={() => setDragging(null)}
           onPointerLeave={() => setDragging(null)}
           role="group"
-          aria-label="Counting line editor"
+          aria-label={t("line.editorLabel")}
         >
           <defs>
             <marker id="arrowhead" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto">
@@ -147,8 +149,13 @@ export function LineEditor({
         </svg>
       </div>
       <p className="line-editor__hint">
-        Drag either endpoint across the gate people walk through — the arrow marks the{" "}
-        <strong>IN</strong> side. {size.width > 0 && `${Math.round(size.width)}px wide preview of ${sourceWidth}×${sourceHeight}`}
+        <Trans i18nKey="line.hint" components={{ 1: <strong /> }} />{" "}
+        {size.width > 0 &&
+          t("line.dimensions", {
+            preview: Math.round(size.width),
+            width: sourceWidth,
+            height: sourceHeight,
+          })}
       </p>
     </div>
   );

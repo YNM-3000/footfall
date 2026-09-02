@@ -5,11 +5,12 @@ from __future__ import annotations
 import json
 import sqlite3
 
-from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from fastapi.responses import Response
 
 from ..bus import drain
 from ..dependencies import StateDep, get_state
+from ..errors import job_already_finished, job_not_found, preview_not_ready, video_not_found
 from ..jobs import build_config
 from ..schemas import CountsOut, CrossingOut, JobOut, JobRequest
 
@@ -22,7 +23,7 @@ TERMINAL_STATUSES = {"completed", "failed", "cancelled"}
 async def create_job(request: JobRequest, state: StateDep) -> JobOut:
     video = state.database.get_video(request.video_id)
     if video is None:
-        raise HTTPException(404, "video not found")
+        raise video_not_found()
 
     config = build_config(
         source=video["path"],
@@ -67,7 +68,7 @@ async def job_preview(job_id: str, state: StateDep) -> Response:
     _require_job(state, job_id)
     image = state.runner.preview_of(job_id)
     if image is None:
-        raise HTTPException(404, "no preview frame yet")
+        raise preview_not_ready()
     return Response(image, media_type="image/jpeg", headers={"Cache-Control": "no-store"})
 
 
@@ -75,7 +76,7 @@ async def job_preview(job_id: str, state: StateDep) -> Response:
 async def cancel_job(job_id: str, state: StateDep) -> JobOut:
     row = _require_job(state, job_id)
     if row["status"] in TERMINAL_STATUSES:
-        raise HTTPException(409, f"job already {row['status']}")
+        raise job_already_finished(row["status"])
     state.runner.cancel(job_id)
     return _to_schema(state.database.get_job(job_id))
 
@@ -106,7 +107,7 @@ async def job_stream(websocket: WebSocket, job_id: str) -> None:
 def _require_job(state, job_id: str) -> sqlite3.Row:
     row = state.database.get_job(job_id)
     if row is None:
-        raise HTTPException(404, "job not found")
+        raise job_not_found()
     return row
 
 

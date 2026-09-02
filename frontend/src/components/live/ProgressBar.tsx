@@ -1,21 +1,29 @@
+import { useTranslation } from "react-i18next";
+
+import type { JobStatus } from "../../api/types";
 import "./progress-bar.css";
 
 interface ProgressBarProps {
   processed: number;
   total: number | null;
-  status: string;
+  status: JobStatus;
 }
 
 export function ProgressBar({ processed, total, status }: ProgressBarProps) {
+  const { t } = useTranslation();
   const fraction = total ? Math.min(1, processed / total) : null;
 
   return (
     <div className="progress">
       <div className="progress__meta">
-        <span className={`progress__status progress__status--${status}`}>{status}</span>
+        {/* data-status stays language-independent, for styling and tests. */}
+        <span className={`progress__status progress__status--${status}`} data-status={status}>
+          {t(`status.${status}`)}
+        </span>
         <span className="progress__frames">
-          {processed}
-          {total ? ` / ${total}` : ""} frames
+          {total
+            ? t("progress.frames", { processed, total })
+            : t("progress.framesUnknown", { processed })}
         </span>
       </div>
       <div

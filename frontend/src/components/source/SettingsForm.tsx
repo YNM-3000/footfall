@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import type { InDirection } from "../../api/types";
 import "./settings-form.css";
 
@@ -17,26 +19,27 @@ interface SettingsFormProps {
 const IMGSZ_CHOICES = [640, 960, 1280, 1600];
 
 export function SettingsForm({ settings, disabled, onChange }: SettingsFormProps) {
+  const { t } = useTranslation();
   const update = <K extends keyof CountingSettings>(key: K, value: CountingSettings[K]) =>
     onChange({ ...settings, [key]: value });
 
   return (
     <div className="settings">
       <label className="settings__field">
-        <span className="settings__label">Counts as “in”</span>
+        <span className="settings__label">{t("settings.inDirection")}</span>
         <select
           value={settings.inDirection}
           disabled={disabled}
           onChange={(event) => update("inDirection", event.target.value as InDirection)}
         >
-          <option value="negative-to-positive">Arrow side</option>
-          <option value="positive-to-negative">Opposite side</option>
+          <option value="negative-to-positive">{t("settings.inDirectionArrow")}</option>
+          <option value="positive-to-negative">{t("settings.inDirectionOpposite")}</option>
         </select>
-        <small>Flip this if a test run reports IN and OUT swapped.</small>
+        <small>{t("settings.inDirectionHelp")}</small>
       </label>
 
       <label className="settings__field">
-        <span className="settings__label">Detection size</span>
+        <span className="settings__label">{t("settings.imgsz")}</span>
         <select
           value={settings.imgsz}
           disabled={disabled}
@@ -48,12 +51,12 @@ export function SettingsForm({ settings, disabled, onChange }: SettingsFormProps
             </option>
           ))}
         </select>
-        <small>Higher finds distant people in wide shots; costs speed.</small>
+        <small>{t("settings.imgszHelp")}</small>
       </label>
 
       <label className="settings__field">
         <span className="settings__label">
-          Confidence <output>{settings.confidence.toFixed(2)}</output>
+          {t("settings.confidence")} <output>{settings.confidence.toFixed(2)}</output>
         </span>
         <input
           type="range"
@@ -64,12 +67,12 @@ export function SettingsForm({ settings, disabled, onChange }: SettingsFormProps
           disabled={disabled}
           onChange={(event) => update("confidence", Number(event.target.value))}
         />
-        <small>Lower catches more people, and more false positives.</small>
+        <small>{t("settings.confidenceHelp")}</small>
       </label>
 
       <label className="settings__field">
         <span className="settings__label">
-          Frame stride <output>{settings.frameStride}</output>
+          {t("settings.frameStride")} <output>{settings.frameStride}</output>
         </span>
         <input
           type="range"
@@ -80,7 +83,7 @@ export function SettingsForm({ settings, disabled, onChange }: SettingsFormProps
           disabled={disabled}
           onChange={(event) => update("frameStride", Number(event.target.value))}
         />
-        <small>Process every Nth frame. Faster, but tracking degrades.</small>
+        <small>{t("settings.frameStrideHelp")}</small>
       </label>
     </div>
   );

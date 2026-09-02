@@ -7,12 +7,13 @@ import uuid
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import APIRouter, File, HTTPException, Query, UploadFile
+from fastapi import APIRouter, File, Query, UploadFile
 from fastapi.responses import Response
 
 from people_counter.video import VideoSourceError, VideoStream, grab_frame
 
 from ..dependencies import StateDep
+from ..errors import frame_unreadable, unreadable_video, unsupported_file_type, video_not_found
 from ..preview import encode_jpeg
 from ..schemas import VideoOut
 from ..storage import VideoRecord, utc_now
@@ -29,7 +30,7 @@ FrameIndex = Annotated[int, Query(ge=0, description="Frame to grab, for placing 
 async def upload_video(state: StateDep, file: UploadedVideo) -> VideoOut:
     suffix = Path(file.filename or "").suffix.lower()
     if suffix not in ALLOWED_SUFFIXES:
-        raise HTTPException(400, f"unsupported file type '{suffix or file.filename}'")
+        raise unsupported_file_type(suffix or (file.filename or "?"))
 
     video_id = uuid.uuid4().hex
     destination = state.settings.uploads_dir / f"{video_id}{suffix}"
@@ -43,7 +44,7 @@ async def upload_video(state: StateDep, file: UploadedVideo) -> VideoOut:
         geometry = _probe(destination)
     except VideoSourceError as error:
         destination.unlink(missing_ok=True)
-        raise HTTPException(400, f"unreadable video: {error}") from error
+        raise unreadable_video(str(error)) from error
 
     record = VideoRecord(
         id=video_id,
@@ -68,11 +69,11 @@ async def list_videos(state: StateDep) -> list[VideoOut]:
 async def video_frame(video_id: str, state: StateDep, index: FrameIndex = 0) -> Response:
     row = state.database.get_video(video_id)
     if row is None:
-        raise HTTPException(404, "video not found")
+        raise video_not_found()
     try:
         frame = grab_frame(row["path"], index)
     except VideoSourceError as error:
-        raise HTTPException(400, str(error)) from error
+        raise frame_unreadable(str(error)) from error
     return Response(
         encode_jpeg(frame, state.settings.preview_width),
         media_type="image/jpeg",

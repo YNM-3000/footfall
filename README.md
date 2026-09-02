@@ -103,6 +103,7 @@ backend/                     # FastAPI service over the library
 frontend/                    # React + Vite dashboard
 └── src/
     ├── api/                 # typed client and wire types
+    ├── i18n/                # zh (default) + en catalogues, type-checked
     ├── hooks/useJobStream   # WebSocket subscription with reconnect
     └── components/          # line editor, counts readout, feed, history
 
@@ -130,6 +131,26 @@ npm run dev                          # http://localhost:5173, proxies /api
 
 For a single-origin deployment, `npm run build` writes `frontend/dist`,
 which the API serves at `/` when present.
+
+### Languages
+
+The dashboard ships in Chinese (default) and English; the switcher sits in the
+masthead and the choice persists per browser. To change the default, set
+`DEFAULT_LANGUAGE` in `frontend/src/i18n/index.ts`.
+
+Adding a locale means one file:
+
+```ts
+// frontend/src/i18n/locales/ja.ts
+import type { zh } from "./zh";
+export const ja: typeof zh = { /* the compiler lists every missing key */ };
+```
+
+`zh.ts` types every other catalogue, so a missing or misspelled key is a build
+error rather than a blank label in production. API errors carry a stable
+`code` (`unsupported_file_type`, `job_not_found`, …) which the client
+translates, falling back to the server's English message for anything not yet
+in the catalogue — so failures are localized too, not just chrome.
 
 ### API
 

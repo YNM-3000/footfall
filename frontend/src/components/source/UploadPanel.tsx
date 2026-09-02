@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { uploadVideo } from "../../api/client";
 import type { Video } from "../../api/types";
@@ -10,6 +11,7 @@ interface UploadPanelProps {
 }
 
 export function UploadPanel({ video, onUploaded }: UploadPanelProps) {
+  const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
   const [progress, setProgress] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +23,7 @@ export function UploadPanel({ video, onUploaded }: UploadPanelProps) {
     try {
       onUploaded(await uploadVideo(file, setProgress));
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "upload failed");
+      setError(cause instanceof Error ? cause.message : t("upload.failed"));
     } finally {
       setProgress(null);
     }
@@ -58,28 +60,33 @@ export function UploadPanel({ video, onUploaded }: UploadPanelProps) {
       {video ? (
         <dl className="upload__meta">
           <div>
-            <dt>File</dt>
+            <dt>{t("upload.file")}</dt>
             <dd title={video.filename}>{video.filename}</dd>
           </div>
           <div>
-            <dt>Resolution</dt>
+            <dt>{t("upload.resolution")}</dt>
             <dd>
               {video.width}×{video.height}
             </dd>
           </div>
           <div>
-            <dt>Frames</dt>
+            <dt>{t("upload.frames")}</dt>
             <dd>
-              {video.frame_count ?? "—"} @ {video.fps.toFixed(0)} fps
+              {t("upload.framesValue", {
+                count: video.frame_count ?? "—",
+                fps: video.fps.toFixed(0),
+              })}
             </dd>
           </div>
         </dl>
       ) : (
-        <p className="upload__prompt">Drop a recording here, or choose a file.</p>
+        <p className="upload__prompt">{t("upload.prompt")}</p>
       )}
 
       <button className="upload__button" type="button" onClick={() => inputRef.current?.click()} disabled={uploading}>
-        {uploading ? `Uploading ${Math.round((progress ?? 0) * 100)}%` : video ? "Replace video" : "Choose video"}
+        {uploading
+          ? t("upload.uploading", { percent: Math.round((progress ?? 0) * 100) })
+          : t(video ? "upload.replace" : "upload.choose")}
       </button>
 
       {uploading && (

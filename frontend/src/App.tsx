@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { cancelJob, createJob, listJobs, stillFrameUrl } from "./api/client";
 import type { Job, Line, Video } from "./api/types";
@@ -13,6 +14,7 @@ import { RunHistory } from "./components/runs/RunHistory";
 import type { CountingSettings } from "./components/source/SettingsForm";
 import { SettingsForm } from "./components/source/SettingsForm";
 import { UploadPanel } from "./components/source/UploadPanel";
+import { LanguageSwitcher } from "./components/ui/LanguageSwitcher";
 import { Panel } from "./components/ui/Panel";
 import { useJobStream } from "./hooks/useJobStream";
 import "./app.css";
@@ -27,6 +29,7 @@ const DEFAULT_SETTINGS: CountingSettings = {
 };
 
 export default function App() {
+  const { t } = useTranslation();
   const [video, setVideo] = useState<Video | null>(null);
   const [line, setLine] = useState<Line | null>(null);
   const [settings, setSettings] = useState<CountingSettings>(DEFAULT_SETTINGS);
@@ -73,7 +76,7 @@ export default function App() {
       setJobId(job.id);
       refreshJobs();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "could not start the run");
+      setError(cause instanceof Error ? cause.message : t("app.startFailed"));
     } finally {
       setStarting(false);
     }
@@ -84,7 +87,7 @@ export default function App() {
     try {
       await cancelJob(jobId);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "could not cancel");
+      setError(cause instanceof Error ? cause.message : t("app.cancelFailed"));
     }
   };
 
@@ -94,19 +97,20 @@ export default function App() {
   return (
     <div className="app">
       <header className="app__masthead">
-        <h1 className="app__title">People Counter</h1>
-        <p className="app__subtitle">
-          Detection, tracking, and line crossing — configured on the frame, watched live.
-        </p>
+        <div className="app__masthead-row">
+          <h1 className="app__title">{t("app.title")}</h1>
+          <LanguageSwitcher />
+        </div>
+        <p className="app__subtitle">{t("app.subtitle")}</p>
       </header>
 
       <main className="app__grid">
         <div className="app__column">
-          <Panel title="Source" step="01">
+          <Panel title={t("panels.source")} slug="source" step="01">
             <UploadPanel video={video} onUploaded={onUploaded} />
           </Panel>
 
-          <Panel title="Counting line" step="02">
+          <Panel title={t("panels.line")} slug="line" step="02">
             {video && line ? (
               <>
                 <LineEditor
@@ -126,18 +130,18 @@ export default function App() {
                       onClick={() => void start()}
                       disabled={running || starting}
                     >
-                      {starting ? "Starting…" : running ? "Counting…" : "Start counting"}
+                      {t(starting ? "app.starting" : running ? "app.counting" : "app.start")}
                     </button>
                     {running && (
                       <button className="app__secondary" type="button" onClick={() => void stop()}>
-                        Stop
+                        {t("app.stop")}
                       </button>
                     )}
                   </div>
                 </div>
               </>
             ) : (
-              <p className="app__placeholder">Upload a recording to place the counting line.</p>
+              <p className="app__placeholder">{t("app.placeholderLine")}</p>
             )}
             {error && (
               <p className="app__error" role="alert">
@@ -149,12 +153,13 @@ export default function App() {
 
         <div className="app__column">
           <Panel
-            title="Live count"
+            title={t("panels.live")}
+            slug="live"
             step="03"
             aside={
               jobId && (
                 <span className={`app__link${stream.connected ? " app__link--live" : ""}`}>
-                  {stream.connected ? "connected" : "offline"}
+                  {t(stream.connected ? "app.connected" : "app.offline")}
                 </span>
               )
             }
@@ -175,15 +180,15 @@ export default function App() {
                 <LivePreview jobId={jobId} revision={previewRevision} running={running} />
               </div>
             ) : (
-              <p className="app__placeholder">Start a run to watch counts arrive.</p>
+              <p className="app__placeholder">{t("app.placeholderLive")}</p>
             )}
           </Panel>
 
-          <Panel title="Crossings" step="04">
+          <Panel title={t("panels.crossings")} slug="crossings" step="04">
             <CrossingFeed crossings={stream.crossings} />
           </Panel>
 
-          <Panel title="Runs" step="05">
+          <Panel title={t("panels.runs")} slug="runs" step="05">
             <RunHistory jobs={jobs} activeJobId={jobId} onSelect={setJobId} />
           </Panel>
         </div>

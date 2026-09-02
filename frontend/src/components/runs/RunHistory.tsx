@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import type { Job } from "../../api/types";
 import "./run-history.css";
 
@@ -12,8 +14,10 @@ interface RunHistoryProps {
  * live cameras the same shape becomes the tile grid.
  */
 export function RunHistory({ jobs, activeJobId, onSelect }: RunHistoryProps) {
+  const { t, i18n } = useTranslation();
+
   if (jobs.length === 0) {
-    return <p className="runs__empty">No runs yet.</p>;
+    return <p className="runs__empty">{t("runs.empty")}</p>;
   }
 
   return (
@@ -26,14 +30,14 @@ export function RunHistory({ jobs, activeJobId, onSelect }: RunHistoryProps) {
             onClick={() => onSelect(job.id)}
             aria-current={job.id === activeJobId}
           >
-            <span className={`runs__status runs__status--${job.status}`}>{job.status}</span>
+            <span className={`runs__status runs__status--${job.status}`}>{t(`status.${job.status}`)}</span>
             <span className="runs__counts">
               <span className="runs__in">+{job.counts.entries}</span>
               <span className="runs__out">−{job.counts.exits}</span>
               <span className="runs__net">= {job.counts.net}</span>
             </span>
             <time className="runs__time" dateTime={job.created_at}>
-              {new Date(job.created_at).toLocaleTimeString()}
+              {new Date(job.created_at).toLocaleTimeString(i18n.language)}
             </time>
           </button>
         </li>

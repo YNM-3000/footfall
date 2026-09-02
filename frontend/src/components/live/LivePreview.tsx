@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { previewUrl } from "../../api/client";
 import "./live-preview.css";
@@ -18,6 +19,7 @@ interface LivePreviewProps {
  * would, and it is enough to confirm the boxes and the gate look right.
  */
 export function LivePreview({ jobId, revision, running }: LivePreviewProps) {
+  const { t } = useTranslation();
   const [failed, setFailed] = useState(false);
 
   // A job that has not produced a frame yet has no preview to serve; reset
@@ -27,7 +29,7 @@ export function LivePreview({ jobId, revision, running }: LivePreviewProps) {
   if (revision === 0 || failed) {
     return (
       <p className="live-preview__pending">
-        {running ? "Waiting for the first annotated frame…" : "No preview frame for this run."}
+        {running ? t("preview.waiting") : t("preview.none")}
       </p>
     );
   }
@@ -37,11 +39,11 @@ export function LivePreview({ jobId, revision, running }: LivePreviewProps) {
       <img
         className="live-preview__image"
         src={previewUrl(jobId, revision)}
-        alt="Latest annotated frame with detected people and the counting line"
+        alt={t("preview.alt")}
         onError={() => setFailed(true)}
       />
       <figcaption className="live-preview__caption">
-        {running ? "Annotated frame, refreshed as counting progresses" : "Final annotated frame"}
+        {running ? t("preview.running") : t("preview.finished")}
       </figcaption>
     </figure>
   );

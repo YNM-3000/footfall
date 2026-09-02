@@ -1,0 +1,28 @@
+.language {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--surface-inset);
+}
+
+.language__option {
+  padding: var(--space-hair) var(--space-snug);
+  border: none;
+  border-radius: calc(var(--radius-sm) - 2px);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--text-small);
+  transition: color var(--duration-fast) var(--ease-out-expo),
+    background var(--duration-fast) var(--ease-out-expo);
+}
+
+.language__option:hover {
+  color: var(--text-primary);
+}
+
+.language__option--active {
+  background: var(--surface-raised);
+  color: var(--text-primary);
+}

@@ -1,3 +1,5 @@
+import i18n from "../i18n";
+import { isTranslatedErrorCode } from "../i18n/errors";
 import type { Crossing, Job, JobRequest, Video } from "./types";
 
 /** Empty by default: Vite proxies /api to the backend in development. */
@@ -11,17 +13,42 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return (await response.json()) as T;
 }
 
+interface ApiErrorDetail {
+  code: string;
+  message: string;
+  params?: Record<string, string | number>;
+}
+
+const isApiErrorDetail = (value: unknown): value is ApiErrorDetail =>
+  typeof value === "object" && value !== null && typeof (value as ApiErrorDetail).code === "string";
+
+/**
+ * Turns an API failure into a message in the operator's language.
+ *
+ * The backend sends a stable `code`; the English `message` is the fallback
+ * for anything not in the catalogue, so a new server error degrades to
+ * readable text instead of a blank string.
+ */
+export function translateError(body: unknown, fallback: string): string {
+  const detail = (body as { detail?: unknown })?.detail;
+
+  if (isApiErrorDetail(detail)) {
+    return isTranslatedErrorCode(detail.code)
+      ? i18n.t(`errors.${detail.code}`, detail.params ?? {})
+      : detail.message;
+  }
+  // FastAPI validation errors arrive as a list of field problems.
+  if (Array.isArray(detail)) return i18n.t("errors.invalid_request");
+  if (typeof detail === "string") return detail;
+  return fallback;
+}
+
 async function readError(response: Response): Promise<string> {
   try {
-    const body = await response.json();
-    const detail = body.detail;
-    if (typeof detail === "string") return detail;
-    // FastAPI validation errors arrive as a list of field problems.
-    if (Array.isArray(detail)) return detail.map((item) => item.msg).join("; ");
+    return translateError(await response.json(), `${response.status} ${response.statusText}`);
   } catch {
-    // Fall through to the status line below.
+    return `${response.status} ${response.statusText}`;
   }
-  return `${response.status} ${response.statusText}`;
 }
 
 /**
@@ -45,16 +72,17 @@ export function uploadVideo(file: File, onProgress: (fraction: number) => void):
         reject(new Error(parseXhrError(xhr)));
       }
     });
-    xhr.addEventListener("error", () => reject(new Error("upload failed — is the API running?")));
+    xhr.addEventListener("error", () => reject(new Error(i18n.t("upload.noApi"))));
     xhr.send(body);
   });
 }
 
 function parseXhrError(xhr: XMLHttpRequest): string {
+  const fallback = `${i18n.t("upload.failed")} (${xhr.status})`;
   try {
-    return JSON.parse(xhr.responseText).detail ?? `upload failed (${xhr.status})`;
+    return translateError(JSON.parse(xhr.responseText), fallback);
   } catch {
-    return `upload failed (${xhr.status})`;
+    return fallback;
   }
 }
 

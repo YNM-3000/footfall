@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import type { Crossing } from "../../api/types";
 import "./crossing-feed.css";
 
@@ -13,8 +15,10 @@ const formatTimestamp = (seconds: number): string => {
 
 /** Individual crossings, newest first — the audit trail behind the totals. */
 export function CrossingFeed({ crossings }: CrossingFeedProps) {
+  const { t } = useTranslation();
+
   if (crossings.length === 0) {
-    return <p className="crossing-feed__empty">No crossings yet.</p>;
+    return <p className="crossing-feed__empty">{t("crossings.empty")}</p>;
   }
 
   return (
@@ -24,8 +28,8 @@ export function CrossingFeed({ crossings }: CrossingFeedProps) {
           className={`crossing-feed__row crossing-feed__row--${crossing.direction}`}
           key={`${crossing.track_id}-${crossing.frame_index}`}
         >
-          <span className="crossing-feed__direction">{crossing.direction}</span>
-          <span className="crossing-feed__track">#{crossing.track_id}</span>
+          <span className="crossing-feed__direction">{t(`crossings.${crossing.direction}`)}</span>
+          <span className="crossing-feed__track">{t("crossings.track", { id: crossing.track_id })}</span>
           <span className="crossing-feed__time">{formatTimestamp(crossing.timestamp)}</span>
         </li>
       ))}

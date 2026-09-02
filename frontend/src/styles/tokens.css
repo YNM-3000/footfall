@@ -20,7 +20,10 @@
   --accent-live: oklch(72% 0.19 25);
   --accent-focus: oklch(72% 0.15 250);
 
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* CJK faces are listed explicitly: without them the Chinese UI falls back
+     to whatever the system picks, which rarely matches the Latin face. */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
   --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
 
   --text-micro: 0.6875rem;
