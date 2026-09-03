@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+from collections.abc import Iterator
 from pathlib import Path
 
 import cv2
@@ -39,7 +40,7 @@ class WalkingPersonTracker:
 def clip(tmp_path: Path) -> Path:
     path = tmp_path / "clip.mp4"
     writer = cv2.VideoWriter(
-        str(path), cv2.VideoWriter_fourcc(*"mp4v"), CLIP_FPS, (FRAME_WIDTH, FRAME_HEIGHT)
+        str(path), cv2.VideoWriter.fourcc(*"mp4v"), CLIP_FPS, (FRAME_WIDTH, FRAME_HEIGHT)
     )
     assert writer.isOpened()
     for _ in range(FRAME_COUNT):
@@ -49,7 +50,7 @@ def clip(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def client(tmp_path: Path) -> TestClient:
+def client(tmp_path: Path) -> Iterator[TestClient]:
     settings = Settings(
         uploads_dir=tmp_path / "uploads",
         database_path=tmp_path / "db.sqlite",

@@ -5,7 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Annotated
 
-from fastapi import Depends, Request
+from fastapi import Depends
+from starlette.requests import HTTPConnection
 
 from .bus import EventBus
 from .jobs import JobRunner
@@ -21,8 +22,9 @@ class AppState:
     runner: JobRunner
 
 
-def get_state(request: Request) -> AppState:
-    return request.app.state.services
+def get_state(connection: HTTPConnection) -> AppState:
+    """Works for both routes and WebSocket handlers."""
+    return connection.app.state.services
 
 
 StateDep = Annotated[AppState, Depends(get_state)]

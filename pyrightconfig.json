@@ -1,0 +1,10 @@
+{
+  "venvPath": ".",
+  "venv": ".venv",
+  "include": ["core/src", "core/tests", "backend/src", "backend/tests"],
+  "exclude": ["**/__pycache__", "**/.*", "frontend", "data", "out", "models"],
+  "extraPaths": ["core/src", "backend/src", "backend/tests"],
+  "pythonVersion": "3.10",
+  "typeCheckingMode": "standard",
+  "reportMissingTypeStubs": false
+}

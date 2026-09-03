@@ -116,7 +116,7 @@ class AnnotatedVideoWriter:
         self._path.parent.mkdir(parents=True, exist_ok=True)
         writer = cv2.VideoWriter(
             str(self._path),
-            cv2.VideoWriter_fourcc(*FOURCC),
+            cv2.VideoWriter.fourcc(*FOURCC),
             self._fps,
             self._size,
         )

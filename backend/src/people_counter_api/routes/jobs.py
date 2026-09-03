@@ -9,7 +9,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from fastapi.responses import Response
 
 from ..bus import drain
-from ..dependencies import StateDep, get_state
+from ..dependencies import AppState, StateDep, get_state
 from ..errors import job_already_finished, job_not_found, preview_not_ready, video_not_found
 from ..jobs import build_config
 from ..schemas import CountsOut, CrossingOut, JobOut, JobRequest
@@ -36,7 +36,7 @@ async def create_job(request: JobRequest, state: StateDep) -> JobOut:
         max_frames=request.max_frames,
     )
     job_id = state.runner.submit(config, video_id=video["id"], total_frames=_expected_frames(video, request))
-    return _to_schema(state.database.get_job(job_id))
+    return _to_schema(_require_job(state, job_id))
 
 
 @router.get("", response_model=list[JobOut])
@@ -78,7 +78,7 @@ async def cancel_job(job_id: str, state: StateDep) -> JobOut:
     if row["status"] in TERMINAL_STATUSES:
         raise job_already_finished(row["status"])
     state.runner.cancel(job_id)
-    return _to_schema(state.database.get_job(job_id))
+    return _to_schema(_require_job(state, job_id))
 
 
 @router.websocket("/{job_id}/stream")
@@ -104,7 +104,7 @@ async def job_stream(websocket: WebSocket, job_id: str) -> None:
             return
 
 
-def _require_job(state, job_id: str) -> sqlite3.Row:
+def _require_job(state: AppState, job_id: str) -> sqlite3.Row:
     row = state.database.get_job(job_id)
     if row is None:
         raise job_not_found()

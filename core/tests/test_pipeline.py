@@ -39,7 +39,7 @@ def clip(tmp_path: Path) -> Path:
     path = tmp_path / "clip.mp4"
     writer = cv2.VideoWriter(
         str(path),
-        cv2.VideoWriter_fourcc(*"mp4v"),
+        cv2.VideoWriter.fourcc(*"mp4v"),
         10.0,
         (FRAME_WIDTH, FRAME_HEIGHT),
     )

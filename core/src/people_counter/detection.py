@@ -8,12 +8,22 @@ counting, rendering, or CLI layers.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Any, Protocol
 
 import numpy as np
 
 from .config import PERSON_CLASS_ID
 from .geometry import BoundingBox
+
+
+def _to_numpy(value: Any) -> np.ndarray:
+    """Detach a torch tensor, if that is what ultralytics handed back.
+
+    Results carry tensors for tensor sources and plain arrays otherwise;
+    handling both keeps this working either way.
+    """
+    detach = getattr(value, "cpu", None)
+    return np.asarray(detach().numpy() if detach is not None else value)
 
 
 @dataclass(frozen=True)
@@ -47,21 +57,25 @@ class YoloByteTrackTracker:
 
     def track(self, frame: np.ndarray) -> tuple[TrackedPerson, ...]:
         # persist=True keeps ByteTrack's identity memory across calls;
-        # classes restricts detection to the COCO "person" class.
-        results = self._model.track(
-            frame,
-            persist=True,
-            classes=[PERSON_CLASS_ID],
-            conf=self._confidence,
-            verbose=False,
-            **({} if self._imgsz is None else {"imgsz": self._imgsz}),
-        )
+        # classes restricts detection to the COCO "person" class. Collected
+        # into a dict[str, Any] because ultralytics takes a very wide keyword
+        # surface, which a narrower type would fight.
+        options: dict[str, Any] = {
+            "persist": True,
+            "classes": [PERSON_CLASS_ID],
+            "conf": self._confidence,
+            "verbose": False,
+        }
+        if self._imgsz is not None:
+            options["imgsz"] = self._imgsz
+
+        results = self._model.track(frame, **options)
         boxes = results[0].boxes
         if boxes is None or boxes.id is None:
             return ()
 
-        coordinates = boxes.xyxy.cpu().numpy()
-        track_ids = boxes.id.cpu().numpy().astype(int)
+        coordinates = _to_numpy(boxes.xyxy)
+        track_ids = _to_numpy(boxes.id).astype(int)
         return tuple(
             TrackedPerson(track_id=int(track_id), box=BoundingBox(*(float(v) for v in box)))
             for box, track_id in zip(coordinates, track_ids)

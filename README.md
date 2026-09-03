@@ -210,6 +210,7 @@ uv sync --group dev              # runtime + test dependencies
 uv run pytest                    # core + backend, no weights or footage
 uv run pytest --cov=core/src --cov=backend/src
 uv run ruff check . && uv run ruff format --check .
+uv run pyright                   # type check (config in pyrightconfig.json)
 
 cd frontend
 npm run build                    # type-check and bundle
