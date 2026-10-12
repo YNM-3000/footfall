@@ -1,7 +1,7 @@
 import { chromium } from "playwright";
 
 // Drives the real dashboard against a running API. Requires:
-//   1. `uv run people-counter-api` (serves frontend/dist)
+//   1. `uv run footfall-api` (serves frontend/dist)
 //   2. `npm run build`
 // Usage: BASE=... VIDEO=... node e2e/smoke.mjs
 const BASE = process.env.BASE ?? "http://127.0.0.1:8000";

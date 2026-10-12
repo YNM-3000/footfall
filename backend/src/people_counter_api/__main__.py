@@ -1,4 +1,4 @@
-"""`people-counter-api` — run the service."""
+"""`footfall-api` — run the service."""
 
 from __future__ import annotations
 

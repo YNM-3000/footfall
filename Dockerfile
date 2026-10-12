@@ -65,4 +65,4 @@ ENV PEOPLE_COUNTER_HOST=0.0.0.0 \
     PEOPLE_COUNTER_PORT=8000
 EXPOSE 8000
 
-CMD ["people-counter-api"]
+CMD ["footfall-api"]

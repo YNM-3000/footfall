@@ -58,16 +58,16 @@ creates the environment automatically on first run.
 
 ```bash
 # from a recorded video file
-uv run people-counter --source data/pedestrian.mp4 --output out/annotated.mp4
+uv run footfall --source data/pedestrian.mp4 --output out/annotated.mp4
 
 # from a live camera stream (RTSP/HTTP URL) — same code, different source
-uv run people-counter --source rtsp://user:pass@camera-ip/stream --output out/annotated.mp4
+uv run footfall --source rtsp://user:pass@camera-ip/stream --output out/annotated.mp4
 
 # from a webcam, for quick local testing
-uv run people-counter --source 0 --show
+uv run footfall --source 0 --show
 
 # quick spot-check on the first 100 frames of a long clip
-uv run people-counter --source data/pedestrian.mp4 --max-frames 100
+uv run footfall --source data/pedestrian.mp4 --max-frames 100
 ```
 
 `uv run python -m people_counter --source ...` is equivalent.
@@ -145,7 +145,7 @@ actually walk, and watch counts arrive while it processes.
 
 ```bash
 uv sync                              # installs core + backend
-uv run people-counter-api            # http://127.0.0.1:8000
+uv run footfall-api            # http://127.0.0.1:8000
 
 cd frontend && npm install
 npm run dev                          # http://localhost:5173, proxies /api

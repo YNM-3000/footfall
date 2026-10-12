@@ -17,7 +17,7 @@ Homepage = "https://github.com/YNM-3000/footfall"
 Issues = "https://github.com/YNM-3000/footfall/issues"
 
 [project.scripts]
-people-counter = "people_counter.cli:main"
+footfall = "people_counter.cli:main"
 
 [build-system]
 requires = ["hatchling"]

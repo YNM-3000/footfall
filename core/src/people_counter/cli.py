@@ -20,16 +20,16 @@ from .video import VideoSourceError
 
 DESCRIPTION = "Camera-based people in/out counter (YOLO + ByteTrack)."
 EPILOG = """examples:
-  people-counter --source data/pedestrian.mp4 --output out/annotated.mp4
-  people-counter --source rtsp://user:pass@camera-ip/stream --output out/annotated.mp4
-  people-counter --source 0 --show
+  footfall --source data/pedestrian.mp4 --output out/annotated.mp4
+  footfall --source rtsp://user:pass@camera-ip/stream --output out/annotated.mp4
+  footfall --source 0 --show
 """
 STREAM_PREFIXES = ("rtsp://", "rtmp://", "http://", "https://", "udp://", "tcp://")
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="people-counter",
+        prog="footfall",
         description=DESCRIPTION,
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,

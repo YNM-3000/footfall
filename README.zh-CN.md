@@ -44,16 +44,16 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ```bash
 # 处理录制好的视频文件
-uv run people-counter --source data/pedestrian.mp4 --output out/annotated.mp4
+uv run footfall --source data/pedestrian.mp4 --output out/annotated.mp4
 
 # 处理实时摄像头流（RTSP/HTTP URL）：代码不变，只换输入源
-uv run people-counter --source rtsp://user:pass@camera-ip/stream --output out/annotated.mp4
+uv run footfall --source rtsp://user:pass@camera-ip/stream --output out/annotated.mp4
 
 # 使用本机摄像头，方便本地快速测试
-uv run people-counter --source 0 --show
+uv run footfall --source 0 --show
 
 # 对长视频的前 100 帧做快速抽查
-uv run people-counter --source data/pedestrian.mp4 --max-frames 100
+uv run footfall --source data/pedestrian.mp4 --max-frames 100
 ```
 
 `uv run python -m people_counter --source ...` 与上面的写法等价。
@@ -124,7 +124,7 @@ data/  out/  models/         # footage, artifacts, weights (git-ignored)
 
 ```bash
 uv sync                              # 安装 core + backend
-uv run people-counter-api            # http://127.0.0.1:8000
+uv run footfall-api            # http://127.0.0.1:8000
 
 cd frontend && npm install
 npm run dev                          # http://localhost:5173，代理 /api
