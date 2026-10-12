@@ -16,6 +16,18 @@
 3. **计数**：在画面上画一条虚拟线（比如闸机口或走廊）。当被跟踪者的中心点穿过这条线时，按方向给 IN 或 OUT 计数器加一。
 4. **在场人数**：当前总数 = IN − OUT。
 
+## 使用 Docker 快速开始
+
+```bash
+docker compose up --build        # 控制台地址 http://127.0.0.1:8000
+```
+
+API 和构建好的控制台会跑在同一个容器里。上传文件、SQLite 数据库和模型权重（首次使用时下载）都保存在具名卷中，重启后不会丢失。端口只发布在 `127.0.0.1` 上，修改之前请先阅读[安全](#安全)。
+
+镜像默认安装 CPU 版 PyTorch，体积不到 2 GB。如果要在 NVIDIA GPU 主机上运行，请用 `docker compose build --build-arg TORCH_VARIANT=cuda` 构建，并为容器开启 GPU 访问。
+
+不用 Docker 的话，请继续往下看。
+
 ## 环境要求
 
 - Python ≥ 3.10

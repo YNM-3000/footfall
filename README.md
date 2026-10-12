@@ -24,6 +24,23 @@ monitoring of several live camera streams — see
    counter increments depending on direction.
 4. **Occupancy** — running total = IN − OUT.
 
+## Quick start with Docker
+
+```bash
+docker compose up --build        # dashboard at http://127.0.0.1:8000
+```
+
+This runs the API and the built dashboard in one container. Uploads, the
+SQLite database, and the model weights (downloaded on first use) are kept in
+named volumes, so they survive restarts. The port is published on `127.0.0.1`
+only. Read [Security](#security) before you change that.
+
+The image installs CPU-only PyTorch, which keeps it under 2 GB. On an NVIDIA
+GPU host, build with `docker compose build --build-arg TORCH_VARIANT=cuda`
+and give the container GPU access.
+
+To run without Docker, read on.
+
 ## Requirements
 
 - Python ≥ 3.10

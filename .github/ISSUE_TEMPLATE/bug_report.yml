@@ -26,7 +26,7 @@ body:
     id: environment
     attributes:
       label: Environment
-      description: OS, Python version, CPU/GPU, and how you run it (for example uv).
+      description: OS, Python version, CPU/GPU, and how you run it (uv, Docker).
       placeholder: macOS 15 (M2), Python 3.12, uv
     validations:
       required: true
