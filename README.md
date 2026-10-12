@@ -1,4 +1,9 @@
-# People Counter
+# Footfall
+
+[![CI](https://github.com/YNM-3000/footfall/actions/workflows/ci.yml/badge.svg)](https://github.com/YNM-3000/footfall/actions/workflows/ci.yml)
+[![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
+
+English | [简体中文](README.zh-CN.md)
 
 Camera-based people counting: detect and track people via computer vision,
 count entries and exits across a virtual line, and watch the numbers live in
@@ -192,7 +197,7 @@ or separate hosts.
 
 ### Throughput
 
-Measured on this machine (CPU, `yolov8n`, per stream):
+Measured on an Apple Silicon Mac (CPU, `yolov8n`, per stream):
 
 | `imgsz` | Throughput | People detected per frame |
 | ------- | ---------- | ------------------------- |
@@ -241,6 +246,36 @@ counts in both directions. On dense crowd footage at default `--imgsz 640`,
 a 4K frame is letterboxed down far enough that distant people go undetected;
 raise `--imgsz` before trusting the totals.
 
+## Responsible use
+
+This project counts people. It doesn't identify them. It does no face
+recognition and no re-identification across cameras or sessions, and a track ID
+is only a per-run number. The durable output is anonymous crossing events: a
+direction, a frame number, and a timestamp.
+
+The footage itself is personal data, though. In many jurisdictions (GDPR in
+the EU, PIPL in China, and others) recording people, even only to count them,
+comes with obligations. Before you point this at a real camera:
+
+- Check the local rules for video recording, and put up signage where it's
+  required.
+- Keep only what you need. Counting doesn't require keeping footage. Delete
+  uploads and annotated videos under `data/` and `out/` once you've validated
+  a camera, and run live cameras with no video output.
+- Restrict access to the dashboard and the `data/` directory. See
+  [Security](#security).
+
+Don't use this project to track specific individuals, to profile people, or
+to monitor anyone covertly.
+
+## Security
+
+The API has **no authentication**. It binds to `127.0.0.1` by default, and
+it's meant for a trusted machine or network. If you expose it beyond that,
+put it behind a reverse proxy that handles authentication and TLS. See
+[SECURITY.md](SECURITY.md) for the deployment model and for how to report
+vulnerabilities privately.
+
 ## Roadmap
 
 - [x] Detection + tracking + line-crossing counting (CLI)
@@ -252,3 +287,21 @@ raise `--imgsz` before trusting the totals.
 - [ ] Occupancy baseline and daily true-up (net drifts over long runs)
 - [ ] History charts from stored crossing events
 - [ ] Process- or host-level workers, and GPU inference
+
+## Contributing
+
+Issues and pull requests are welcome. [CONTRIBUTING.md](CONTRIBUTING.md)
+covers setup, the checks CI runs, and the project conventions.
+
+## License
+
+Footfall is licensed under the [GNU Affero General Public License v3.0](LICENSE).
+
+The license follows from the detector. Footfall depends on
+[Ultralytics](https://github.com/ultralytics/ultralytics), and both the
+library and its YOLO weights are AGPL-3.0. So if you modify this project and
+let people use it over a network, for example a hosted counting dashboard,
+you must offer them the source of your modified version. If you need
+different terms, you'll need a commercial license from Ultralytics, or you'll
+need to swap in a detector with a permissive license through the
+`detection.PersonTracker` protocol.

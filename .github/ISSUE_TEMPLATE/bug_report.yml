@@ -1,0 +1,36 @@
+name: Bug report
+description: Something counts wrong, crashes, or misbehaves
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: How to reproduce
+      description: The command or dashboard steps, including `--line`, `--imgsz`, `--conf`, and the model you used.
+      placeholder: uv run people-counter --source clip.mp4 --line 0 540 1920 540 --imgsz 1280
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or error output
+      render: shell
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python version, CPU/GPU, and how you run it (for example uv).
+      placeholder: macOS 15 (M2), Python 3.12, uv
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        Please don't attach footage of identifiable people. Describe the scene (camera angle, crowd density, resolution) or share a frame with faces blurred.

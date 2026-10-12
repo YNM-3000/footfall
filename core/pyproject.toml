@@ -3,11 +3,18 @@ name = "people-counter-core"
 version = "0.3.0"
 description = "Person detection, tracking, and line-crossing counting."
 requires-python = ">=3.10"
+license = "AGPL-3.0-only"
+authors = [{ name = "YNM3000", email = "742702052@qq.com" }]
+keywords = ["people-counting", "computer-vision", "yolo", "bytetrack", "object-tracking"]
 dependencies = [
     "ultralytics>=8.3.0",
     "opencv-python>=4.10.0",
     "lapx>=0.5.11",
 ]
+
+[project.urls]
+Homepage = "https://github.com/YNM-3000/footfall"
+Issues = "https://github.com/YNM-3000/footfall/issues"
 
 [project.scripts]
 people-counter = "people_counter.cli:main"
