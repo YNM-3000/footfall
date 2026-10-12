@@ -6,9 +6,9 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
-# settings.py -> people_counter_api -> src -> backend -> repo root
+# settings.py -> footfall_api -> src -> backend -> repo root
 DEFAULT_ROOT = Path(__file__).resolve().parents[3]
-ENV_PREFIX = "PEOPLE_COUNTER_"
+ENV_PREFIX = "FOOTFALL_"
 # One job saturates several cores already; the default keeps a laptop usable.
 DEFAULT_MAX_CONCURRENT_JOBS = 2
 DEFAULT_PREVIEW_WIDTH = 720
@@ -28,7 +28,7 @@ class Settings:
         base = root or Path(os.environ.get(f"{ENV_PREFIX}ROOT", DEFAULT_ROOT))
         return cls(
             uploads_dir=Path(os.environ.get(f"{ENV_PREFIX}UPLOADS", base / "data" / "uploads")),
-            database_path=Path(os.environ.get(f"{ENV_PREFIX}DB", base / "data" / "people_counter.db")),
+            database_path=Path(os.environ.get(f"{ENV_PREFIX}DB", base / "data" / "footfall.db")),
             model=os.environ.get(f"{ENV_PREFIX}MODEL", str(base / "models" / "yolov8n.pt")),
             max_concurrent_jobs=int(os.environ.get(f"{ENV_PREFIX}MAX_JOBS", DEFAULT_MAX_CONCURRENT_JOBS)),
         )

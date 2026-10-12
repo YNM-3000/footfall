@@ -1,4 +1,4 @@
-"""HTTP/WebSocket service for the people counter dashboard."""
+"""HTTP/WebSocket service for the Footfall dashboard."""
 
 from .app import create_app
 from .settings import Settings

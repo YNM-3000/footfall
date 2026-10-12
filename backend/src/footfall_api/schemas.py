@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field, field_validator
 
-from people_counter.counting import InDirection
+from footfall.counting import InDirection
 
 MIN_IMGSZ = 32
 

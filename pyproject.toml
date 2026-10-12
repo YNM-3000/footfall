@@ -2,13 +2,13 @@
 members = ["core", "backend"]
 
 [tool.uv.sources]
-people-counter-core = { workspace = true }
-people-counter-backend = { workspace = true }
+footfall-core = { workspace = true }
+footfall-backend = { workspace = true }
 
 [dependency-groups]
 dev = [
-    "people-counter-core",
-    "people-counter-backend",
+    "footfall-core",
+    "footfall-backend",
     "pytest>=8.0",
     "pytest-cov>=5.0",
     "ruff>=0.6",

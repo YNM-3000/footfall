@@ -61,8 +61,8 @@ RUN useradd --create-home --uid 1000 counter \
 USER counter
 
 # The container is the network boundary; compose publishes to localhost only.
-ENV PEOPLE_COUNTER_HOST=0.0.0.0 \
-    PEOPLE_COUNTER_PORT=8000
+ENV FOOTFALL_HOST=0.0.0.0 \
+    FOOTFALL_PORT=8000
 EXPOSE 8000
 
 CMD ["footfall-api"]

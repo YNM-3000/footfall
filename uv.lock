@@ -15,16 +15,16 @@ resolution-markers = [
 
 [manifest]
 members = [
-    "people-counter-backend",
-    "people-counter-core",
+    "footfall-backend",
+    "footfall-core",
 ]
 
 [manifest.dependency-groups]
 dev = [
+    { name = "footfall-backend", editable = "backend" },
+    { name = "footfall-core", editable = "core" },
     { name = "httpx", specifier = ">=0.27" },
     { name = "numpy", specifier = ">=1.26" },
-    { name = "people-counter-backend", editable = "backend" },
-    { name = "people-counter-core", editable = "core" },
     { name = "pyright", specifier = ">=1.1.390" },
     { name = "pytest", specifier = ">=8.0" },
     { name = "pytest-cov", specifier = ">=5.0" },
@@ -745,6 +745,43 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/21/ff/2eab37d43f2e2ccc0993959d8f2605d9a68470082c592684ac98611ee70a/fonttools-4.64.0-cp315-cp315t-win32.whl", hash = "sha256:f8669ce37851b597d3435b91fefa51139e58d506ca449ca0e5bb68c63b8b6d2b", size = 2463614, upload-time = "2026-08-31T15:44:27.198Z" },
     { url = "https://files.pythonhosted.org/packages/dc/8d/8bdff3ea656592197c8ef5062774221885468ffa01d8b0dc782dae23a83a/fonttools-4.64.0-cp315-cp315t-win_amd64.whl", hash = "sha256:89356c0793b474af7e49ec90d39fb2363e2341516a90460e38231df5ebe8acd5", size = 2512422, upload-time = "2026-08-31T15:44:29.478Z" },
     { url = "https://files.pythonhosted.org/packages/82/f8/7188153c4b265c899cd035de6a062677d51f67118a4ba640902bd9683e90/fonttools-4.64.0-py3-none-any.whl", hash = "sha256:4a05783ff54ce4c7a28f18e5772efdf63c219374bd9ffc55452182e1cef8be60", size = 1195327, upload-time = "2026-08-31T15:44:31.741Z" },
+]
+
+[[package]]
+name = "footfall-backend"
+version = "0.3.0"
+source = { editable = "backend" }
+dependencies = [
+    { name = "fastapi" },
+    { name = "footfall-core" },
+    { name = "python-multipart" },
+    { name = "uvicorn", extra = ["standard"] },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fastapi", specifier = ">=0.115" },
+    { name = "footfall-core", editable = "core" },
+    { name = "python-multipart", specifier = ">=0.0.9" },
+    { name = "uvicorn", extras = ["standard"], specifier = ">=0.30" },
+]
+
+[[package]]
+name = "footfall-core"
+version = "0.3.0"
+source = { editable = "core" }
+dependencies = [
+    { name = "lapx" },
+    { name = "opencv-python" },
+    { name = "ultralytics", version = "8.4.123", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' and sys_platform == 'darwin'" },
+    { name = "ultralytics", version = "8.4.137", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or sys_platform != 'darwin'" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "lapx", specifier = ">=0.5.11" },
+    { name = "opencv-python", specifier = ">=4.10.0" },
+    { name = "ultralytics", specifier = ">=8.3.0" },
 ]
 
 [[package]]
@@ -1787,43 +1824,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/7d/fa/3944b40b07da9ce895c0e6303a5ab7d53da063554f534556b134a54d6093/packaging-26.3.tar.gz", hash = "sha256:94edc256424af38762eb31306eed28beb9f0efc50a8837492c9d6fd6004aed79", size = 313412, upload-time = "2026-08-04T18:15:28.737Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/63/34/ba1c580383c9eada3711951fef0795c80b829a078d72188184bcab9dd527/packaging-26.3-py3-none-any.whl", hash = "sha256:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c", size = 129956, upload-time = "2026-08-04T18:15:27.159Z" },
-]
-
-[[package]]
-name = "people-counter-backend"
-version = "0.3.0"
-source = { editable = "backend" }
-dependencies = [
-    { name = "fastapi" },
-    { name = "people-counter-core" },
-    { name = "python-multipart" },
-    { name = "uvicorn", extra = ["standard"] },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "fastapi", specifier = ">=0.115" },
-    { name = "people-counter-core", editable = "core" },
-    { name = "python-multipart", specifier = ">=0.0.9" },
-    { name = "uvicorn", extras = ["standard"], specifier = ">=0.30" },
-]
-
-[[package]]
-name = "people-counter-core"
-version = "0.3.0"
-source = { editable = "core" }
-dependencies = [
-    { name = "lapx" },
-    { name = "opencv-python" },
-    { name = "ultralytics", version = "8.4.123", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' and sys_platform == 'darwin'" },
-    { name = "ultralytics", version = "8.4.137", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or sys_platform != 'darwin'" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "lapx", specifier = ">=0.5.11" },
-    { name = "opencv-python", specifier = ">=4.10.0" },
-    { name = "ultralytics", specifier = ">=8.3.0" },
 ]
 
 [[package]]

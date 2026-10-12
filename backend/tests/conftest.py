@@ -11,10 +11,10 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-from people_counter.detection import TrackedPerson
-from people_counter.geometry import BoundingBox
-from people_counter_api.app import create_app
-from people_counter_api.settings import Settings
+from footfall.detection import TrackedPerson
+from footfall.geometry import BoundingBox
+from footfall_api.app import create_app
+from footfall_api.settings import Settings
 
 FRAME_WIDTH = 320
 FRAME_HEIGHT = 240

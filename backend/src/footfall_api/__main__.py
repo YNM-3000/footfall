@@ -12,11 +12,11 @@ DEFAULT_PORT = 8000
 
 def main() -> None:
     uvicorn.run(
-        "people_counter_api.app:create_app",
+        "footfall_api.app:create_app",
         factory=True,
-        host=os.environ.get("PEOPLE_COUNTER_HOST", DEFAULT_HOST),
-        port=int(os.environ.get("PEOPLE_COUNTER_PORT", DEFAULT_PORT)),
-        reload=bool(os.environ.get("PEOPLE_COUNTER_RELOAD")),
+        host=os.environ.get("FOOTFALL_HOST", DEFAULT_HOST),
+        port=int(os.environ.get("FOOTFALL_PORT", DEFAULT_PORT)),
+        reload=bool(os.environ.get("FOOTFALL_RELOAD")),
     )
 
 

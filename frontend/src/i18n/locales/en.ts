@@ -2,7 +2,7 @@ import type { zh } from "./zh";
 
 export const en: typeof zh = {
   app: {
-    title: "People Counter",
+    title: "Footfall",
     subtitle: "Configure the counting line on the frame, and watch counts arrive live.",
     language: "Language",
     placeholderLine: "Upload a recording to place the counting line.",

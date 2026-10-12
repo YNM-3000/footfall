@@ -1,4 +1,4 @@
-"""Enables `python -m people_counter ...`."""
+"""Enables `python -m footfall ...`."""
 
 from .cli import main
 

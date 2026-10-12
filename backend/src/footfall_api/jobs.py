@@ -16,11 +16,11 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from people_counter.config import AppConfig
-from people_counter.counting import CrossingEvent
-from people_counter.detection import PersonTracker
-from people_counter.pipeline import AnnotatedFrame, RunProgress, run
-from people_counter.video import VideoSourceError
+from footfall.config import AppConfig
+from footfall.counting import CrossingEvent
+from footfall.detection import PersonTracker
+from footfall.pipeline import AnnotatedFrame, RunProgress, run
+from footfall.video import VideoSourceError
 
 from .bus import EventBus
 from .preview import encode_jpeg

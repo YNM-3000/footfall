@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-from people_counter.counting import CrossingEvent
+from footfall.counting import CrossingEvent
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS videos (

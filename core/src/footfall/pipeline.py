@@ -21,7 +21,7 @@ from .geometry import Line
 from .rendering import annotate
 from .video import AnnotatedVideoWriter, VideoStream
 
-PREVIEW_WINDOW = "people_counter"
+PREVIEW_WINDOW = "footfall"
 QUIT_KEY = "q"
 
 ProgressCallback = Callable[["RunProgress"], None]

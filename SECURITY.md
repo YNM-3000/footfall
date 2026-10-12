@@ -27,7 +27,7 @@ It's built to run on a trusted machine or a trusted network:
 
 - The API binds to `127.0.0.1` by default. Docker Compose publishes it on
   `127.0.0.1:8000` only.
-- Don't set `PEOPLE_COUNTER_HOST=0.0.0.0` or publish the port publicly
+- Don't set `FOOTFALL_HOST=0.0.0.0` or publish the port publicly
   unless a reverse proxy in front of it handles authentication and TLS.
 - Camera URLs passed to `--source` often contain credentials
   (`rtsp://user:pass@...`). Keep them out of shell history and shared

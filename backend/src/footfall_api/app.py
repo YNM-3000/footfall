@@ -36,7 +36,7 @@ def create_app(settings: Settings | None = None, *, tracker_factory=None) -> Fas
         finally:
             app.state.services.runner.shutdown()
 
-    app = FastAPI(title="People Counter", version="0.3.0", lifespan=lifespan)
+    app = FastAPI(title="Footfall", version="0.3.0", lifespan=lifespan)
 
     database = Database(resolved.database_path)
     bus = EventBus()

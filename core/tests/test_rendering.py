@@ -2,10 +2,10 @@
 
 import numpy as np
 
-from people_counter.counting import Counts
-from people_counter.detection import TrackedPerson
-from people_counter.geometry import BoundingBox, Line
-from people_counter.rendering import BOX_COLOR, _hud_font_scale, annotate
+from footfall.counting import Counts
+from footfall.detection import TrackedPerson
+from footfall.geometry import BoundingBox, Line
+from footfall.rendering import BOX_COLOR, _hud_font_scale, annotate
 
 
 def blank(width: int = 640, height: int = 480) -> np.ndarray:

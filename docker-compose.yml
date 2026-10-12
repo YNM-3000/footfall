@@ -1,7 +1,7 @@
 name: footfall
 
 services:
-  people-counter:
+  footfall:
     build: .
     image: footfall:latest
     ports:
@@ -9,9 +9,9 @@ services:
       - "127.0.0.1:8000:8000"
     volumes:
       # Uploads and the SQLite database.
-      - people-counter-data:/app/data
+      - footfall-data:/app/data
       # YOLO weights, downloaded on first run.
-      - people-counter-models:/app/models
+      - footfall-models:/app/models
     restart: unless-stopped
     healthcheck:
       test:
@@ -25,5 +25,5 @@ services:
       retries: 3
 
 volumes:
-  people-counter-data:
-  people-counter-models:
+  footfall-data:
+  footfall-models:

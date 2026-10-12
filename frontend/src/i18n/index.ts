@@ -13,7 +13,7 @@ export type LanguageCode = (typeof SUPPORTED_LANGUAGES)[number]["code"];
 
 /** Chinese unless the operator has chosen otherwise on this machine. */
 export const DEFAULT_LANGUAGE: LanguageCode = "zh";
-const STORAGE_KEY = "people-counter.language";
+const STORAGE_KEY = "footfall.language";
 
 const isSupported = (value: string | null): value is LanguageCode =>
   SUPPORTED_LANGUAGES.some((language) => language.code === value);

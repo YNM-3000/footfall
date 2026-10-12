@@ -1,4 +1,4 @@
-from people_counter.geometry import BoundingBox, Line
+from footfall.geometry import BoundingBox, Line
 
 
 def test_centroid_is_box_center():

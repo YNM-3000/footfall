@@ -10,12 +10,12 @@ import cv2
 import numpy as np
 import pytest
 
-from people_counter.config import AppConfig
-from people_counter.counting import Direction
-from people_counter.detection import TrackedPerson
-from people_counter.geometry import BoundingBox
-from people_counter.pipeline import run
-from people_counter.video import VideoSourceError
+from footfall.config import AppConfig
+from footfall.counting import Direction
+from footfall.detection import TrackedPerson
+from footfall.geometry import BoundingBox
+from footfall.pipeline import run
+from footfall.video import VideoSourceError
 
 FRAME_WIDTH = 320
 FRAME_HEIGHT = 240

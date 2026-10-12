@@ -1,13 +1,13 @@
 [project]
-name = "people-counter-backend"
+name = "footfall-backend"
 version = "0.3.0"
-description = "HTTP/WebSocket service exposing the people counter to the dashboard."
+description = "HTTP/WebSocket service exposing Footfall to the dashboard."
 requires-python = ">=3.10"
 license = "AGPL-3.0-only"
 authors = [{ name = "YNM3000", email = "742702052@qq.com" }]
 keywords = ["people-counting", "computer-vision", "yolo", "bytetrack", "object-tracking"]
 dependencies = [
-    "people-counter-core",
+    "footfall-core",
     "fastapi>=0.115",
     "uvicorn[standard]>=0.30",
     "python-multipart>=0.0.9",
@@ -18,14 +18,14 @@ Homepage = "https://github.com/YNM-3000/footfall"
 Issues = "https://github.com/YNM-3000/footfall/issues"
 
 [project.scripts]
-footfall-api = "people_counter_api.__main__:main"
+footfall-api = "footfall_api.__main__:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/people_counter_api"]
+packages = ["src/footfall_api"]
 
 [tool.uv.sources]
-people-counter-core = { workspace = true }
+footfall-core = { workspace = true }

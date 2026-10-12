@@ -70,7 +70,7 @@ uv run footfall --source 0 --show
 uv run footfall --source data/pedestrian.mp4 --max-frames 100
 ```
 
-`uv run python -m people_counter --source ...` is equivalent.
+`uv run python -m footfall --source ...` is equivalent.
 
 ### Flags
 
@@ -101,7 +101,7 @@ Three layers in a uv workspace. Each depends only on the one below it.
 
 ```
 core/                        # the counting library — no web, no HTTP
-├── src/people_counter/
+├── src/footfall/
 │   ├── cli.py               # command line entry point
 │   ├── config.py            # AppConfig + defaults (single source of truth)
 │   ├── pipeline.py          # frames -> tracking -> counting -> events
@@ -113,7 +113,7 @@ core/                        # the counting library — no web, no HTTP
 └── tests/
 
 backend/                     # FastAPI service over the library
-├── src/people_counter_api/
+├── src/footfall_api/
 │   ├── app.py               # application factory
 │   ├── routes/              # videos, jobs, WebSocket stream
 │   ├── jobs.py              # JobRunner: pipeline execution off the event loop

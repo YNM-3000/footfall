@@ -10,7 +10,7 @@ from typing import Annotated
 from fastapi import APIRouter, File, Query, UploadFile
 from fastapi.responses import Response
 
-from people_counter.video import VideoSourceError, VideoStream, grab_frame
+from footfall.video import VideoSourceError, VideoStream, grab_frame
 
 from ..dependencies import StateDep
 from ..errors import frame_unreadable, unreadable_video, unsupported_file_type, video_not_found

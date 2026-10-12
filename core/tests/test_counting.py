@@ -1,7 +1,7 @@
 import pytest
 
-from people_counter.counting import Counts, Direction, InDirection, LineCrossingCounter
-from people_counter.geometry import Line
+from footfall.counting import Counts, Direction, InDirection, LineCrossingCounter
+from footfall.geometry import Line
 
 ABOVE = (50.0, 10.0)  # negative side of the midline
 BELOW = (50.0, 90.0)  # positive side of the midline

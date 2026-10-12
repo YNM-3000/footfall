@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from people_counter.cli import build_parser, config_from_args, validate_source
-from people_counter.counting import InDirection
+from footfall.cli import build_parser, config_from_args, validate_source
+from footfall.counting import InDirection
 
 
 def parse(argv: list[str]):
